@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from unittest import result
 from langchain.agents import create_agent
 from langchain.tools import tool
-from langchain_openai import AzureChatOpenAI
+from langchain_openai import AzureChatOpenAI # imports the LangChain connector for Azure OpenAI.
 
 
 
@@ -22,36 +22,7 @@ def create_langchain_agent():
         azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],    # APIM gateway endpoint 
         api_version=os.environ["AZURE_OPENAI_API_VERSION"], 
         temperature=1   
-   )   
-"""Create a LangChain agent that extracts a task from user input."""
-
-import os
-
-from dotenv import load_dotenv
-from langchain.agents import create_agent
-from langchain.tools import tool
-from langchain_openai import AzureChatOpenAI
-
-load_dotenv()
-
-
-@tool
-def extract_task_from_input(input_text: str) -> str:
-
-    """Return only the core task contained in the user's input."""
-
-    return input_text.strip()
-
-
-def create_langchain_agent():
-    llm = AzureChatOpenAI(
-        azure_deployment=os.environ['AZURE_OPENAI_CHAT_DEPLOYMENT'],
-        api_key=os.environ["AZURE_OPENAI_API_KEY"],
-        azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"], 
-        api_version=os.environ["AZURE_OPENAI_API_VERSION"],
-        temperature=1,
-    )
-
+    )   
     return create_agent(
         model=llm,
         tools=[extract_task_from_input],
