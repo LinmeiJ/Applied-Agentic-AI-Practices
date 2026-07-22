@@ -1,4 +1,5 @@
 """Integrate the agents using LangGraph."""
+### Run me via CLI: python main.py
 
 from typing import TypedDict
 from langgraph.graph import END, StateGraph
