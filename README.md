@@ -1,6 +1,6 @@
 # 🚀 SETUP_GUIDE.md
 
-# Complete Student Setup Guide for AI Agentic Track Demos
+# Complete Student Setup Guide for AI Agentic Track Demos (Notes from instructor)
 
 ---
 # Why This Matters
