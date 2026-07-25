@@ -24,6 +24,10 @@ app = FastAPI(
 ## create thes service, its like autowire a class as service
 service = LinkedInService()
 
+@app.get("/")
+async def root():
+    return {"message": "LinkedIn Content Automation API"}
+
 @app.get("/config")
 def config_test():
     settings = get_settings()
