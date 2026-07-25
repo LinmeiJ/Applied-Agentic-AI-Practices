@@ -303,3 +303,24 @@ print(result.messages[-1].content)
 
 This produces a clean output containing only the generated LinkedIn ideas.
 
+# Once all agents constructed, here is where we ended up having:
+```
+                POST /linkedin
+                       │
+                       ▼
+               LinkedInService
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+   Idea Agent     Writer Agent   Reviewer Agent
+        │              │              │
+        └──────────────┼──────────────┘
+                       ▼
+               Hashtag Agent
+                       ▼
+              LinkedInResponse
+```
+1. Idea agent: Generates content ideas
+2. Write agent: Writes the LinkedIn post
+3. Reviewer agent: Improves grammar, tone, and professionalism
+4. Hashtag: Generates relevant LinkedIn hashtags

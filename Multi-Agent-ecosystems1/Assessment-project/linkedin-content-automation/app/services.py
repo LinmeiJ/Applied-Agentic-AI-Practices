@@ -33,7 +33,7 @@ class LinkedInService:
         return LinkedInResponse(
             ideas=[ideas],
             draft=reviewed_draft,
-            confidence=0.85,
+            confidence=0.8, #The confidence score is currently a fixed value used to demonstrate the approval-gate workflow. In a production implementation, this value would be generated dynamically by an evaluator or reviewer agent based on the quality of the generated content.
             hashtags=hashtags,
             status="generated",
         )
