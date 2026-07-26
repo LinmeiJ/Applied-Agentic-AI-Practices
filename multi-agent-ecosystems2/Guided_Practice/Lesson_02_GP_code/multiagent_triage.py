@@ -7,6 +7,8 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.progress import track
 import time
+import os
+from dotenv import load_dotenv
 
 # Initialize Rich console for better visualization
 console = Console()
@@ -14,14 +16,16 @@ console = Console()
 # Configuration - Set True for Azure, False for OpenAI
 USE_AZURE = True # Change to False to use OpenAI instead
 
+load_dotenv()
+
 # Azure OpenAI credentials
-AZURE_OPENAI_API_KEY = "2ABecnfxzhRg4M5D6pBKiqxXVhmGB2WvQ0aYKkbTCPsj0JLKsZPfJQQJ99BDAC77bzfXJ3w3AAABACOGi3sC"
-AZURE_OPENAI_ENDPOINT = "https://openai-api-management-gw.azure-api.net"
-AZURE_OPENAI_API_VERSION = "2025-01-01-preview"
-AZURE_OPENAI_DEPLOYMENT = "gpt-5-mini"
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
+AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
 
 # OpenAI credentials (if not using Azure)
-OPENAI_API_KEY = "YOUR_OPENAI_KEY"  # Replace with your OpenAI API key
+# OPENAI_API_KEY = "YOUR_OPENAI_KEY"  # Replace with your OpenAI API key
 
 # LLM Configuration based on provider choice
 if USE_AZURE:
@@ -38,7 +42,7 @@ else:
     llm_config = {
         "config_list": [{
             "model": "gpt-5-mini",
-            "api_key": OPENAI_API_KEY,
+            "api_key": AZURE_OPENAI_API_KEY,
         }],
     }
 
