@@ -80,7 +80,7 @@ Open your browser and go to:
 ```
 http://localhost:5678
 ```
-
+Note: if there already container running: ```docker rm -f n8n```
 You should see the **n8n welcome screen**.
 
 ---
