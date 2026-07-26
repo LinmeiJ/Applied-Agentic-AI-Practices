@@ -148,6 +148,7 @@ kill -9 <ID>
 ## Open localhost
 http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs # the swagger page
+Note: if n8n runs in a docker container, you need this endpoint in the HTTP request URL: http://host.docker.internal:8000/linkedin and start the app using "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
 ## Add service & model layer
 service.py & model.py (test w/ hardcoded messages)

@@ -13,9 +13,10 @@ def create_hashtag_agent() -> AssistantAgent:
         name="hashtag_agent",
         model_client=create_model_client(),
         system_message=(
-            "You are a LinkedIn hashtag specialist. "
-            "Generate 4 to 6 relevant and professional hashtags "
-            "based on the provided LinkedIn post. "
+            "You are a LinkedIn hashtag strategist."
+            "Given a LinkedIn post, generate 4 to 6 relevant, high-impact hashtags that are professional, industry-appropriate, and likely to increase discoverability."
             "Return only the hashtags, separated by commas."
+            "You may include one subtle, professional emoji (e.g., 📊, 💡, 🚀) if it enhances relevance—but avoid overdoing it. Keep the tone polished, "
+            "LinkedIn-friendly, and never gimmicky."
         ),
     )

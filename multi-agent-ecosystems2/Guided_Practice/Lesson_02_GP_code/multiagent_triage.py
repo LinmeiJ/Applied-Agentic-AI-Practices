@@ -9,6 +9,7 @@ from rich.progress import track
 import time
 import os
 from dotenv import load_dotenv
+import time
 
 # Initialize Rich console for better visualization
 console = Console()
@@ -209,13 +210,22 @@ def run_multiagent_triage():
     
     # Start the group chat
     try:
+ 
+        """If it were async/concurrent, you'd expect total time to be closer to the slowest single call rather than the sum of all calls.
+          With this script, total time will scale roughly linearly with the number of exchanged messages — a clear sign of sequential/blocking execution,
+            consistent with everything above.""" 
+        start = time.time()   # <-- ADD THIS before initiate_chat() to check whether it is 
+
         # Initiate chat through the user proxy
         user_proxy.initiate_chat(
             manager,
             message=initial_message,
             clear_history=True
         )
-        
+
+        elapsed = time.time() - start   # <-- ADD THIS right after initiate_chat() returns
+        console.print(f"[dim]Total time: {elapsed:.1f}s[/dim]")   # <-- ADD THIS
+
         console.print("\n[bold green]��� Triage Discussion Complete![/bold green]\n")
         
         # Display final summary

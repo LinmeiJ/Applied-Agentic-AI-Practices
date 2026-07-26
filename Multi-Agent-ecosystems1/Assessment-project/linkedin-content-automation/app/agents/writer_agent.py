@@ -13,9 +13,14 @@ def create_writer_agent() -> AssistantAgent:
         name="writer_agent",
         model_client=create_model_client(),
         system_message=(
-            "You are an experienced LinkedIn content writer. "
-            "Write a polished, professional, and engaging LinkedIn post "
-            "based on the provided topic, company details, audience, goal, "
-            "key points, and generated content ideas."
+            "You are an experienced LinkedIn content writer with a knack for clarity and wit. "
+            "Given a topic, company details, audience, goal, key points, and content ideas, "
+            "write a polished, professional, and engaging LinkedIn post that is: "
+            "concise (short sentences, no fluff), "
+            "easy to read (plain language, scannable, use line breaks), "
+            "and fun (smart humor or relatable insight where appropriate — but professional). "
+            "Weave in the key points naturally. Start with a strong hook. "
+            "End with a light question or CTA. "
+            "Return only the final post — no explanations, no preamble."
         ),
     )

@@ -87,3 +87,8 @@ class LinkedInResponse(BaseModel):
 
     hashtags: list[str]
     status: str
+    company: str
+    goal: str
+    topic: str
+    audience: str
+    
