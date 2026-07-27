@@ -6,16 +6,17 @@ from app.agents.hashtag_agent import create_hashtag_agent
 
 
 class LinkedInService:
-
     async def generate_post(
         self,
         request: LinkedInRequest,
     ) -> LinkedInResponse:
+       
+       #This part is for revision flow
+        if request.revise:                
+            return await self._revise_post(request)
 
         topic = request.context.topic
-
         ideas = await generate_linkedin_ideas(topic)
-
         draft = await generate_linkedin_draft(
             request,
             ideas,
@@ -39,10 +40,64 @@ class LinkedInService:
             company=request.brand.company_name,
             goal=request.context.goal,
             topic=request.context.topic,
-            audience=request.brand.target_audience
+            audience=request.brand.target_audience,
+            revision_number = request.revision_number
         )
+    
+
+    async def _revise_post(
+        self,
+        request: LinkedInRequest,
+    ) -> LinkedInResponse:
+        """
+        Revise an existing LinkedIn post using reviewer feedback.
+        """
+        print("=== Incoming _revise_post request ===")
+        print(request.model_dump_json(indent=2))
+        print("======================================")
 
 
+        reviewer_agent = create_reviewer_agent()
+
+        task = f"""
+            Revise the LinkedIn post below based on the reviewer's feedback.
+
+            Brand voice:
+            {request.brand.brand_voice}
+
+            Target audience:
+            {request.brand.target_audience}
+
+            Previous post:
+            {request.previous_post}
+
+            Reviewer feedback:
+            {request.human_feedback}
+
+            Reviewer number:
+            {request.revision_number}
+
+            Apply the feedback, and also improve grammar, clarity, engagement, and professionalism.
+            Return only the revised post.
+            """
+
+        result = await reviewer_agent.run(task=task)
+        revised_draft = result.messages[-1].content
+
+        hashtags = await generate_hashtags(revised_draft)
+
+        return LinkedInResponse(
+            ideas=[],
+            draft=revised_draft,
+            confidence=0.9,
+            hashtags=hashtags,
+            status="revised",
+            company=request.brand.company_name,
+            goal=request.context.goal,
+            topic=request.context.topic,
+            audience=request.brand.target_audience,
+            revision_number= request.revision_number,
+        )
 
 async def generate_linkedin_ideas(topic: str) -> str:
     """
@@ -148,3 +203,4 @@ Generate 4 to 6 professional LinkedIn hashtags for the following post.
     ]
 
     return hashtags
+

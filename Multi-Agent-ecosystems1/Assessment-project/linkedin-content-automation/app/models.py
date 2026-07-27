@@ -51,6 +51,11 @@ class ContentContext(BaseModel):
         description="Important points that should appear in the post",
     )
 
+    revision_number: int = Field(
+        default=0,
+        description="Track revision number when human reviewer requested a revision",
+    )
+
 
 
 class AutomationConfig(BaseModel):
@@ -65,16 +70,6 @@ class AutomationConfig(BaseModel):
         default=True,
         description="When true, route the post for review instead of publishing",
     )
-
-
-class LinkedInRequest(BaseModel):
-    brand: BrandConfig
-    context: ContentContext
-    automation: AutomationConfig = Field(
-        default_factory=AutomationConfig
-    )
-
-
 
 class LinkedInResponse(BaseModel):
     ideas: list[str]
@@ -91,4 +86,40 @@ class LinkedInResponse(BaseModel):
     goal: str
     topic: str
     audience: str
-    
+    revision_number: int = Field(
+        default=0,
+        description="Revision iteration number for this response.",
+)
+
+class LinkedInRequest(BaseModel):
+    brand: BrandConfig
+    context: ContentContext
+    automation: AutomationConfig = Field(
+        default_factory=AutomationConfig,
+    )
+
+    revise: bool = Field(
+        default=False,
+        description="Whether this request is revising an existing post.",
+    )
+
+    previous_post: str | None = Field(
+        default=None,
+        description="The previous LinkedIn post to revise.",
+    )
+
+    human_feedback: str | None = Field(
+        default=None,
+        description="Feedback provided by the reviewer.",
+    )
+
+    reviewer_name: str | None = Field(
+        default=None,
+        description="Name or email of the reviewer.",
+    )
+
+    revision_number: int = Field(
+        default=0,
+        ge=0,
+        description="Revision iteration number.",
+    )
