@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Literal
 
 # Like These are your shared DTOs
 #...BaseModel) topic, audience, tone, and context is like private variables in a java class
@@ -51,12 +52,6 @@ class ContentContext(BaseModel):
         description="Important points that should appear in the post",
     )
 
-    revision_number: int = Field(
-        default=0,
-        description="Track revision number when human reviewer requested a revision",
-    )
-
-
 
 class AutomationConfig(BaseModel):
     minimum_confidence: float = Field(
@@ -89,7 +84,12 @@ class LinkedInResponse(BaseModel):
     revision_number: int = Field(
         default=0,
         description="Revision iteration number for this response.",
-)
+    )
+    decision: Literal["approve", "reject", "revise"] | None = None
+    reject_reason: str | None = Field(
+        default=None,
+        description="Reason why the request was rejected by the system.",
+    )
 
 class LinkedInRequest(BaseModel):
     brand: BrandConfig
@@ -101,6 +101,11 @@ class LinkedInRequest(BaseModel):
     revise: bool = Field(
         default=False,
         description="Whether this request is revising an existing post.",
+    )
+
+    decision: Literal["approve", "reject", "revise"] | None = Field(
+        default=None,
+        description="Decision received from the human-review workflow.",
     )
 
     previous_post: str | None = Field(

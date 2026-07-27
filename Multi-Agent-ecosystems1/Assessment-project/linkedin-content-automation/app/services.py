@@ -4,6 +4,7 @@ from app.agents.writer_agent import create_writer_agent
 from app.agents.reviewer_agent import create_reviewer_agent
 from app.agents.hashtag_agent import create_hashtag_agent
 
+MAX_REVISIONS = 1
 
 class LinkedInService:
     async def generate_post(
@@ -41,7 +42,8 @@ class LinkedInService:
             goal=request.context.goal,
             topic=request.context.topic,
             audience=request.brand.target_audience,
-            revision_number = request.revision_number
+            revision_number = request.revision_number,
+            decision=request.decision,
         )
     
 
@@ -56,6 +58,22 @@ class LinkedInService:
         print(request.model_dump_json(indent=2))
         print("======================================")
 
+
+        if request.revision_number >= MAX_REVISIONS:
+            return LinkedInResponse(
+                ideas=[],
+                draft=request.previous_post or "",
+                confidence=0.0,
+                hashtags=[],
+                status="generated",
+                company=request.brand.company_name,
+                goal=request.context.goal,
+                topic=request.context.topic,
+                audience=request.brand.target_audience,
+                revision_number=request.revision_number,
+                decision="reject",
+                reject_reason=("System rejection: Revision limit exceeded"),
+            )
 
         reviewer_agent = create_reviewer_agent()
 
@@ -97,6 +115,8 @@ class LinkedInService:
             topic=request.context.topic,
             audience=request.brand.target_audience,
             revision_number= request.revision_number,
+            decision=request.decision,
+            reject_reason=None,
         )
 
 async def generate_linkedin_ideas(topic: str) -> str:
@@ -173,7 +193,6 @@ async def review_linkedin_post(
         Improve grammar, clarity, engagement, and professionalism.
         Return only the improved post.
         """
-
     result = await reviewer_agent.run(task=task)
 
     return result.messages[-1].content

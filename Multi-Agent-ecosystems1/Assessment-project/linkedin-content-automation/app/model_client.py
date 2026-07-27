@@ -28,3 +28,4 @@ def create_model_client():
     #     azure_endpoint=settings.azure_openai_endpoint,
     #     api_key=settings.azure_openai_api_key,
     # )
+
