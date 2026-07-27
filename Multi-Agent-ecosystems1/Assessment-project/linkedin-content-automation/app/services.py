@@ -127,20 +127,20 @@ async def generate_linkedin_draft(
     writer_agent = create_writer_agent()
 
     task = f"""
-Write one LinkedIn post using the information below.
+        Write one LinkedIn post using the information below.
 
-Company: {request.brand.company_name}
-Industry: {request.brand.industry}
-Brand voice: {request.brand.brand_voice}
-Target audience: {request.brand.target_audience}
+        Company: {request.brand.company_name}
+        Industry: {request.brand.industry}
+        Brand voice: {request.brand.brand_voice}
+        Target audience: {request.brand.target_audience}
 
-Topic: {request.context.topic}
-Goal: {request.context.goal}
-Key points: {request.context.key_points}
+        Topic: {request.context.topic}
+        Goal: {request.context.goal}
+        Key points: {request.context.key_points}
 
-Generated ideas:
-{ideas_text}
-"""
+        Generated ideas:
+        {ideas_text}
+        """
 
     result = await writer_agent.run(task=task)
 
@@ -151,7 +151,7 @@ Generated ideas:
 async def review_linkedin_post(
     request: LinkedInRequest,
     draft: str,
-) -> str:
+    ) -> str:
     """
     Review and improve the LinkedIn draft.
     """
@@ -159,20 +159,20 @@ async def review_linkedin_post(
     reviewer_agent = create_reviewer_agent()
 
     task = f"""
-Review the LinkedIn post below.
+        Review the LinkedIn post below.
 
-Brand voice:
-{request.brand.brand_voice}
+        Brand voice:
+        {request.brand.brand_voice}
 
-Target audience:
-{request.brand.target_audience}
+        Target audience:
+        {request.brand.target_audience}
 
-LinkedIn draft:
-{draft}
+        LinkedIn draft:
+        {draft}
 
-Improve grammar, clarity, engagement, and professionalism.
-Return only the improved post.
-"""
+        Improve grammar, clarity, engagement, and professionalism.
+        Return only the improved post.
+        """
 
     result = await reviewer_agent.run(task=task)
 
