@@ -53,3 +53,4 @@ async def generate_linkedin_post(
     request: LinkedInRequest,
 ) -> LinkedInResponse:
     return await service.generate_post(request)
+

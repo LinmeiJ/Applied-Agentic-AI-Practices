@@ -55,7 +55,7 @@ class ContentContext(BaseModel):
 
 class AutomationConfig(BaseModel):
     minimum_confidence: float = Field(
-        default=0.80,
+        default=0.9,
         ge=0,
         le=1,
         description="Minimum confidence required for automatic publishing",
@@ -73,6 +73,21 @@ class LinkedInResponse(BaseModel):
     confidence: float = Field(
         ge=0,
         le=1,
+        description="LLM-evaluated content quality score."
+    )
+
+    confidence_reason: str = Field(
+        description="Explanation from the evaluator agent for the confidence score."
+    )
+
+    minimum_confidence: float = Field(
+        ge=0,
+        le=1,
+        description="Minimum confidence required for automatic publishing",
+    )
+
+    dry_run: bool = Field(
+        description="Whether automatic publishing is disabled",
     )
 
     hashtags: list[str]
@@ -127,4 +142,4 @@ class LinkedInRequest(BaseModel):
         default=0,
         ge=0,
         description="Revision iteration number.",
-    )
+)

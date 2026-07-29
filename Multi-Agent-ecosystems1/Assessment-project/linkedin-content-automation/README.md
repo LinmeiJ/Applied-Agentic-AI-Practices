@@ -149,9 +149,14 @@ kill -9 <ID>
 http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs # the swagger page
 Note: if n8n runs in a docker container, you need this endpoint in the HTTP request URL: http://host.docker.internal:8000/linkedin and start the app using "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-
+Run n8n: ```n8n source "<Path to project>/.venv/bin/activate"```
 ## Add service & model layer
 service.py & model.py (test w/ hardcoded messages)
+
+## LLM - Ollama
+- run ```ollama serve```: listen tcp 127.0.0.1:11434
+- check if it is running: curl http://localhost:11434
+- check the llm container: ollama ps
 
 ## Configuraiton management (config.py)
 
@@ -212,6 +217,7 @@ app/
 │   ├── writer_agent.py
 │   ├── reviewer_agent.py
 │   └── hashtag_agent.py
+|.  |__ eva
 ```
 
 ### Design Decision
@@ -325,3 +331,13 @@ This produces a clean output containing only the generated LinkedIn ideas.
 2. Write agent: Writes the LinkedIn post
 3. Reviewer agent: Improves grammar, tone, and professionalism
 4. Hashtag: Generates relevant LinkedIn hashtags
+
+
+
+## Debug
+### prerequisite:
+.vscode/launch.json
+### how to enter debug mode
+```cmd+shift+d```
+### how to start app in debug mode
+```press 'F5''```
