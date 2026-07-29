@@ -169,13 +169,21 @@ class LinkedInService:
         review_result = await reviewer_agent.run(task=review_task)
         final_draft = review_result.messages[-1].content
 
+        # print(f"📝 Revised draft length: {len(revised_draft)}")
+        # print(f"📝 Revised draft preview: {revised_draft[:200]}...")
+
         # Evaluate the final version
         confidence, confidence_reason = await evaluate_linkedin_post(
             request,
             final_draft,
         )
 
+        # print(f"📊 Confidence after revision: {confidence}")
+        # print(f"📊 Confidence reason: {confidence_reason}")
+
         hashtags = await generate_hashtags(revised_draft)
+      
+        # print(f"📤 Returning response with confidence: {confidence}")
 
         return LinkedInResponse(
             ideas=[],
