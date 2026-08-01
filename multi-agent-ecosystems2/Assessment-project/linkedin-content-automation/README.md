@@ -1,401 +1,377 @@
-# AI-Powered LinkedIn Content Automation with n8n and - AutoGen Microservice
+# AI-Powered LinkedIn Content Automation with n8n and AutoGen Microservice
 
 ## Overview
-This project challenges you to design and implement an AI-powered workflow
-automation system that streamlines LinkedIn content creation and posting for a fintech
-organization. The solution combines an AutoGen-inspired microservice with the n8n
-workflow orchestrator. The workflow demonstrates intelligent orchestration across
-multiple AI-driven components, including side ideation, drafting, and hashtag
-generation, before applying guardrails for approval and publishing. The project highlights
-how product leaders can deploy automation to achieve efficiency, brand consistency,
-and scale in content strategy.
+This project implements an AI-powered workflow automation system that streamlines LinkedIn content creation for fintech organizations. The solution combines an AutoGen-inspired multi-agent microservice with n8n workflow orchestration.
 
-## Instructions
-• Review the lessons and supporting materials on n8n workflows and AutoGen-
-style multi-agent design
-• Set up the required environment on the Ubuntu VM, including Node.js, n8n, and
-the FastAPI microservice
-• Follow step-by-step development to:
-    - Build the AutoGen-style microservice (/linkedin endpoint)
-    - Configure and connect the n8n workflow with Brand Config, AutoGen Microservice, Compose Final, and Approval Gate nodes
-    - Implement Slack for dry-run testing and prepare LinkedIn integration for live posting
-• Test and debug each component individually (microservice with curl, each n8n
-node with Execute Node, and then the full workflow)
-• Document the architecture, configuration steps, test runs, and error resolutions
-• Submit:
-    - Microservice code (main.py, .env.example)
-    - Exported n8n workflow JSON
-    - Screenshots of successful runs
-    - A short reflection on design decisions, challenges, and trade-offs
-
-## Situation
-FinEdge Mumbai, a fintech company with over five hundred employees, is facing
-significant challenges in its LinkedIn strategy:
-• The content team spends 15+ hours per week manually drafting posts.
-• Inconsistent posting has reduced engagement by 45%.
-• Manual content creation is too slow, causing posts to miss trending topics.
-• Executives lack a unified voice, weakening brand authority.
-Despite having rich domain expertise, the company struggles to maintain an
-authoritative LinkedIn presence. To overcome this, the product team decides to
-implement an AutoGen-style multi-agent workflow that generates consistent, on-brand
-LinkedIn posts with minimal human effort, while retaining oversight through approval
-controls.
-
-## Tasks
-• Build a multi-agent microservice that returns multiple post ideas, a draft post with
-confidence scoring, and relevant hashtags
-• Deploy and test the microservice on your VM, ensuring it accepts brand and context
-information via an API and returns structured JSON output
-• Configure an n8n workflow with nodes for scheduling, brand configuration,
-microservice invocation, composing the final post, approval gate, and routing to
-Slack or LinkedIn
-• Include mechanisms for logging and error handling to ensure transparency and
-traceability
-
-## Actions
-To complete this project, you will have to:
-• Design and implement the AutoGen-style microservice using FastAPI, exposing
-an endpoint that accepts brand configuration and context, then returns JSON
-containing ideas, draft, confidence score, and hashtags
-• Run and test the microservice locally using curl or HTTP client tools to ensure it
-produces the desired output format
-• Create a new workflow in the n8n dashboard, with a schedule trigger set to a
-suitable cadence for LinkedIn posting
-• Add nodes for brand configuration and pass this data to the microservice using
-an HTTP Request node with JSON parameters
-• Parse the microservice response to assemble the final text and hashtags using a
-Set node (no JavaScript required)
-• Implement an approval gate that compares the confidence score against a
-minimum threshold and checks a dry-run flag to route posts to Slack for review
-or LinkedIn for direct publishing
-• Configure Slack integration via incoming webhook or OAuth (optional) to send
-draft posts for human review
-• Add logging by appending run details (for example, timestamp, draft text,
-confidence) to a database or spreadsheet to monitor performance and tune
-thresholds
-• Test the complete flow end-to-end and adjust parameters (for example,
-confidence threshold) for optimal balance between automation and oversight
+**Key Features:**
+- 🤖 5 specialized AI agents (Idea, Writer, Reviewer, Evaluator, Hashtag)
+- 🔄 Revision workflow with human feedback
+- 📊 Confidence scoring with 10-criteria weighted rubric
+- 🚦 Bias/judgment gate for content safety
+- ☁️ Support for both local (Ollama) and cloud (Azure OpenAI) models
+- 📋 n8n workflow with approval gates and Slack integration
+- 📝 Google Sheets logging for transparency
 
 
-## Result
-By the end of this project, you will deliver a working n8n workflow that automates
-LinkedIn content generation, a functioning AutoGen-style microservice, a thorough
-README detailing setup and run instructions, and documentation summarizing your
-design decisions and testing outcomes.
 
-# Technical Detals
-## __init__.py
-The empty __init__.py tells Python that app is a package.
-## Create local python VM
-```
-python3 -m venv .venv
-
-#activate it
-source .venv/bin/activate
-
-#select the environment in vs code using command+shift+p, and search:
-Python: Select Interpreter
-ensure the interpreter containing: .venv/bin/python
-
-```
-
-## Create project structure 
-```
-linkedin-content-automation/
+# Poject Structure 
+## Folder Structure
+linkedin-agent/
 │
 ├── app/
+│   │
 │   ├── __init__.py
-│   └── main.py
+│   ├── main.py                    # FastAPI endpoints
+│   ├── models.py                  # Request/Response models
+│   ├── services.py                # Business orchestration
+│   ├── model_client.py            # Creates Azure/OpenAI model clients
+│   ├── enums.py                   # ModelType enum
+│   │
+│   └── agents/
+│       ├── __init__.py
+│       ├── idea_agent.py
+│       ├── writer_agent.py
+│       ├── reviewer_agent.py
+│       ├── hashtag_agent.py
+│       └── evaluator_agent.py   
 │
 ├── requirements.txt
 ├── README.md
-├── .env.example
-└── .gitignore
+└── .env
+
+
+## Setup Instructions
+
+### 1. Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Python | 3.11+ | Microservice runtime |
+| Ollama | Latest | Local LLM for development |
+| n8n | Latest | Workflow orchestration |
+| Docker | Latest | For n8n container (optional) |
+
+### 2. Clone and Setup Python Environment
+``` 
+# Clone the repository
+git clone <your-repo-url>
+cd linkedin-content-automation
+
+# Create virtual environment
+python3 -m venv .venv
+
+# Activate it
+source .venv/bin/activate  # On macOS/Linux
+# or .venv\Scripts\activate  # On Windows
+
+# Select the environment in VS Code using Cmd+Shift+P, search:
+# Python: Select Interpreter
+# Ensure the interpreter contains: .venv/bin/python
+
+# Install dependencies
+python -m pip install -r requirements.txt
+
+# Verify packages
+python -m pip list
 ```
 
-Run commands:
+# Environment Configuration
 ```
-mkdir app
-touch app/__init__.py
-touch app/main.py
-touch app/services.py
-touch .env.example
-touch .gitignore
-touch README.md
-touch requirements.txt
+# Copy example env file
+cp .env.example .env
+
+# Edit .env with your Azure OpenAI credentials
+# If using Ollama locally, no additional config needed
 ```
 
-## Add dependencies to requirements.txt
-After adding dependencies, then run "python -m pip install -r requirements.txt"
-(use 'python -m pip')
-verify packages and versions using: 'python -m pip list'
-
-## Run main.py
-'python -m uvicorn': Run the Uvicorn web server using the active Python environment.
-'app/main.py': find 'app/main.py'
-':app": using the object named: 'app = FastAPI(...)'
-'--reload': Restart automatically whenever you save a code change.
+# Install and Run Ollama
 ```
-python -m uvicorn app.main:app --reload
-```
-### kills ports that are in use
-```
-lsof -i :<port number>
-kill -9 <ID>
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
 
-```
+# Verify installation
+ollama --version
 
-## Open localhost
-http://127.0.0.1:8000/health
-http://127.0.0.1:8000/docs # the swagger page
-Note: if n8n runs in a docker container, you need this endpoint in the HTTP request URL: http://host.docker.internal:8000/linkedin and start the app using "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-Run n8n at applied-agentic-ai-practices: 
-```
-source .venv/bin/activate
-#then
-n8n
-```
-```
-open -a Docker
-```
+# Pull the model (choose one)
+ollama pull deepseek-r1:14b  # Recommended for quality
+# OR
+ollama pull qwen3:8b         # Lighter, faster
 
-## Add service & model layer
-service.py & model.py (test w/ hardcoded messages)
+# Start Ollama server
+ollama serve
 
-## LLM - Ollama
-- Create the following 3 files:
-![alt text](image.png)
-
-- instsall: curl -fsSL https://ollama.com/install.sh | sh
-    Verify: ollama --version
-    disable auto-start immediately: sudo killall -9 ollama 2>/dev/null  
-    Remove launch service: 
-    ```
-    launchctl bootout gui/$(id -u)/com.ollama.ollama 2>/dev/null
-    sudo launchctl bootout system/com.ollama.ollama 2>/dev/null
-    ```
-    Override to prevent restart:
-    ```
-    launchctl override disable gui/$(id -u)/com.ollama.ollama
-    sudo launchctl override disable system/com.ollama.ollama
-    ```
-    Remove the plist:
-    ```
-    rm -f ~/Library/LaunchAgents/com.ollama.ollama.plist
-    sudo rm -f /Library/LaunchDaemons/com.ollama.ollama.plist
-    ```
-    Stop ollama: (rememebr to quit the desktop one)
-    ```~/.local/bin/ollama-stop.sh```
-    Start ollama:
-        ```~/.local/bin/ollama-stat.sh```
-
-    Kill all ports related to 8000 at once: lsof -ti :8000 | xargs kill -9
-
-
-
-       
-
-
-
-
-- run ```ollama serve```: listen tcp 127.0.0.1:11434
-- check if it is running: 
-```# Check port
+# Check if running
 lsof -i :11434
+```
+## Useful Ollama Commands:
+```
+# Check running models
+ollama ps
 
-# Check processes
-ps aux | grep ollama | grep -v grep
+# Stop ollama by port
+lsof -ti :11434 | xargs kill -9
 
-# Check service status
+# Kill all ollama processes
+sudo killall -9 ollama
+
+# Check service status (macOS)
 launchctl list | grep ollama
 ```
-- check the llm container: ollama ps
-- Kill ollama by port: lsof -ti :11434 | xargs kill -9
-             by all ollama processes: sudo killall -9 ollama
-             Clean kill: lsof -i :11434 & then kill -15 PID
-
-
-
-## Configuraiton management (config.py)
-
-### Install pydantic-settings
+# Run the Microservice
 ```
-python -m pip install pydantic-settings
+# From project root, with venv activated
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Access the API
+# Swagger UI: http://localhost:8000/docs
+# Health check: http://localhost:8000/health
+# Config test: http://localhost:8000/config
 ```
-## Configuration Management (`config.py`)
-
-### Install `pydantic-settings`
-
-```bash
-python -m pip install pydantic-settings
+## If running with n8n in Docker:
 ```
+# Use host.docker.internal in n8n HTTP requests
+# URL: http://host.docker.internal:8000/linkedin
 
-### Purpose
-
-Centralize application configuration using environment variables.
-
-### Features
-
-- Load configuration from `.env`
-- Strongly typed settings
-- Cached singleton using `@lru_cache`
-- Single source of truth for application configuration
-
----
-
-## Create Azure OpenAI Client (`model_client.py`)
-
-### Purpose
-
-Create a reusable Azure OpenAI client for all AI agents.
-
-### Design
-
-- Read Azure settings from `config.py`
-- Return a configured `AzureOpenAIChatCompletionClient`
-- Avoid duplicating client configuration across agents
-
-**Azure Configuration**
-
-- `azure_deployment` = Azure deployment name (e.g. `vt-agi-chat`)
-- `model` = underlying model name (e.g. `gpt-5-mini`)
-
----
-
-## Create Agent Package
-
-Project structure:
-
-```text
-app/
-│
-├── agents/
-│   ├── __init__.py
-│   ├── idea_agent.py
-│   ├── writer_agent.py
-│   ├── reviewer_agent.py
-│   └── hashtag_agent.py
-|.  |__ eva
+# Start app with host 0.0.0.0 to accept external connections
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+## Kill port 8000 if in use:
+```
+lsof -ti :8000 | xargs kill -9
 ```
 
-### Design Decision
+# Test the API
+```
+curl -X POST http://localhost:8000/linkedin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "brand": {
+      "company_name": "FinEdge Mumbai",
+      "industry": "Fintech",
+      "brand_voice": "professional and informative",
+      "target_audience": "Financial professionals and executives"
+    },
+    "context": {
+      "topic": "AI in Financial Planning",
+      "goal": "Educate and engage the audience",
+      "key_points": [
+        "AI improves financial planning accuracy",
+        "Saves time and reduces human error",
+        "Enables real-time decision making"
+      ]
+    },
+    "automation": {
+      "minimum_confidence": 0.85,
+      "dry_run": true
+    }
+  }'
+  ```
+####  Using VS Code Debugger:
+```
+.vscode/launch.json is configured
+# Press Cmd+Shift+D to open debug view
+# Press F5 to start debugging
+```
+expected response:
+ ```
+ {
+  "ideas": [
+    "1. AI is transforming fintech...",
+    "2. The future of financial planning...",
+    "3. Why data-driven decisions win..."
+  ],
+  "draft": "Exciting developments in AI...",
+  "confidence": 0.87,
+  "confidence_reason": "grammar_readability (0.95): Clean writing...",
+  "minimum_confidence": 0.85,
+  "dry_run": true,
+  "hashtags": ["#Fintech", "#AI", "#FinancialPlanning"],
+  "status": "AI_GENERATED",
+  "company": "FinEdge Mumbai",
+  "goal": "Educate and engage the audience",
+  "topic": "AI in Financial Planning",
+  "audience": "Financial professionals and executives",
+  "revision_number": 0,
+  "decision": null,
+  "reject_reason": null
+}
+ ```   
 
-- One agent per file
-- Single Responsibility Principle
-- Easier maintenance and future expansion
+# Set Up n8n
+##  Run n8n with Docker:
+```
+open -a Docker
+docker run -it --rm \
+  --name n8n \
+  -p 5678:5678 \
+  -v ~/.n8n:/home/node/.n8n \
+  n8nio/n8n
+  ```
+  Access n8n: http://localhost:5678
 
----
+#  Import and Configure n8n Workflow
+1. Open n8n dashboard
+2. Click "Import from File"
+3. Select linkedin-workflow.json
+4. Configure the following nodes:
+    Brand Config Node: Set your company details
+    ```
+    {
+  "company_name": "FinEdge Mumbai",
+  "industry": "Fintech",
+  "brand_voice": "professional and informative",
+  "target_audience": "Financial professionals and executives"
+    }
+    ```
+    HTTP Request Node: Point to your microservice
+    ```
+    Method: POST
+    URL: http://host.docker.internal:8000/linkedin (if using Docker)
+    URL: http://localhost:8000/linkedin (if local)
+     ```
+    Slack Node: Configure webhook URL:
+    - Channel: #linkedin-reviews
+    - Credentials: Add Slack OAuth or webhook
 
-## Implement the First AI Agent
+    Google Sheets Node: Configure logging
+    - Spreadsheet ID: Your sheet ID
+    - Sheet Name: "LinkedIn Activity Log"
 
-File:
-
-```text
-app/agents/idea_agent.py
+# Workflow Architecture
+```
+Schedule Trigger (Daily/Weekly)
+        │
+        ▼
+    Brand Config
+        │
+        ▼
+Generate LinkedIn Content (HTTP POST to /linkedin)
+        │
+        ▼
+   Compose Final (Assemble post + hashtags)
+        │
+        ▼
+   Approval Gate (Compare confidence vs threshold)
+        │
+        ├─── If confidence >= threshold ────► LinkedIn Post (Auto-publish)
+        │
+        └─── If confidence < threshold ─────► Slack Human Review
+                                                 │
+                                                 ├─── Approve ──► LinkedIn Post
+                                                 ├─── Revise ───► Create Revision Payload
+                                                 │                    │
+                                                 │                    ▼
+                                                 │              Revise LinkedIn Content
+                                                 │                    │
+                                                 │                    ▼
+                                                 │              Revision Log (Sheet)
+                                                 │
+                                                 └─── Reject ────► Rejection Log (Sheet)
 ```
 
-### Purpose
+# Agent Architecture
+Agent	           Model	               Purpose
+Idea Agent	       Ollama (Local)	     Generates 3-5 creative post ideas
+Writer Agent	    Ollama (Local)	     Writes the draft post
+Reviewer Agent	    Ollama (Local)	     Polishes and improves content
+Evaluator Agent	Azure    OpenAI	          Scores quality with 10-criteria rubric
+Hashtag Agent	         Ollama (Local)	    Generates 4-6 relevant hashtags
 
-Create an AI agent responsible for generating LinkedIn content ideas.
+## Evaluator Rubric (10 Criteria):
+1. grammar_readability (6%)
+2. clarity (8%)
+3. brand_voice_alignment (12%)
+4. audience_alignment (11%)
+5. key_point_coverage (14%)
+6. engagement_potential (10%)
+7. accessibility_and_relatability (10%)
+8. visual_scannability (8%)
+9. topic_relevance (7%)
+10. leadership_tone_appropriateness (14%)
 
-### Components
+Bias Gate: Hard override - if bias detected → confidence = 0.0
 
-- `AssistantAgent`
-- `create_model_client()`
-- Agent name
-- System message (agent role)
+# Logging
+## Google Sheets logs:
+- LinkedIn Post Activity Log: All generated posts
+- Revision Log: Revision history with feedback
+- Rejection Log: Rejected posts with reasons
 
-### Key Concept
+## Log Entries Include:
+- Timestamp
+- Draft text
+- Confidence score
+- Decision (approve/reject/revise)
+- Company name
+- Topic
+- Revision number
 
-The **system message** defines the agent's permanent role.
+# Error Handling
+Component	                   Error Handling Strategy
+FastAPI Service	           Try/except wrappers, fallback responses, retry logic
+Agents	               Retry up to 3 times, graceful degradation
+n8n HTTP	           120s timeout, validation node
+n8n Workflow	       Error handler node, Slack alerts
 
-Example:
-
+# Troubleshooting
+"Agent not responding" / "Model not found"
 ```
-You are an experienced LinkedIn content strategist.
-```
+# Check Ollama is running
+ollama ps
+ollama serve
 
-The **task** changes for every request.
-
-Example:
-
-```
-Generate three LinkedIn post ideas about Agentic AI.
-```
-
----
-
-## Test the Agent
-
-Create a temporary test script:
-
-```text
-test_agent.py
-```
-
-Run:
-
-```bash
-python test_agent.py
-```
-
-### Purpose
-
-Validate the AI agent independently before integrating it into the FastAPI service.
-
-### Verification
-
-- Azure OpenAI connection works
-- Agent returns a response
-- Configuration is correct
-- Prompt behaves as expected
-
----
-
-## Improve Test Output
-
-Instead of printing the entire `TaskResult`:
-
-```python
-print(result)
+# Pull the model if missing
+ollama pull deepseek-r1:14b
 ```
 
-Print only the AI response:
+"Connection refused" when calling API from n8n"
+```
+# Check FastAPI is running with host 0.0.0.0
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-```python
-print(result.messages[-1].content)
+# In n8n, use host.docker.internal if n8n is in Docker
+http://host.docker.internal:8000/linkedin
+```
+"API Key missing" error
+```
+# Check .env file exists and has all required keys
+cat .env
+```
+"Port 8000 already in use"
+```
+lsof -ti :8000 | xargs kill -9
+```
+"Evaluator returns 0.0 confidence"
+```
+# Check Azure OpenAI credentials in .env
+# Verify the model deployment exists
+# Check the evaluator is using ModelType.CLOUD (Azure)
 ```
 
-This produces a clean output containing only the generated LinkedIn ideas.
-
-# Once all agents constructed, here is where we ended up having:
+# Development Commands Reference
 ```
-                POST /linkedin
-                       │
-                       ▼
-               LinkedInService
-                       │
-        ┌──────────────┼──────────────┐
-        ▼              ▼              ▼
-   Idea Agent     Writer Agent   Reviewer Agent
-        │              │              │
-        └──────────────┼──────────────┘
-                       ▼
-               Hashtag Agent
-                       ▼
-              LinkedInResponse
+# Activate virtual environment
+source .venv/bin/activate
+
+# Install dependencies
+python -m pip install -r requirements.txt
+
+# Run FastAPI with auto-reload
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Run n8n (from venv)
+n8n
+
+# Kill port 8000
+lsof -ti :8000 | xargs kill -9
+
+# Check Python packages
+python -m pip list
+
+# VS Code Debug: Press F5
 ```
-1. Idea agent: Generates content ideas
-2. Write agent: Writes the LinkedIn post
-3. Reviewer agent: Improves grammar, tone, and professionalism
-4. Hashtag: Generates relevant LinkedIn hashtags
 
 
 
-## Debug
-### prerequisite:
-.vscode/launch.json
-### how to enter debug mode
-```cmd+shift+d```
-### how to start app in debug mode
-```press 'F5''```
+
+
