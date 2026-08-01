@@ -48,7 +48,7 @@ class LinkedInService:
             minimum_confidence=request.automation.minimum_confidence,
             dry_run=request.automation.dry_run,
             hashtags=hashtags,
-            status="generated",
+            status="AI_GENERATED",
             company=request.brand.company_name,
             goal=request.context.goal,
             topic=request.context.topic,
@@ -81,7 +81,7 @@ class LinkedInService:
                 minimum_confidence=request.automation.minimum_confidence,
                 dry_run=request.automation.dry_run,
                 hashtags=[],
-                status="generated",
+                status="AI_REJECTED",
                 company=request.brand.company_name,
                 goal=request.context.goal,
                 topic=request.context.topic,
@@ -181,7 +181,7 @@ class LinkedInService:
         # print(f"📊 Confidence after revision: {confidence}")
         # print(f"📊 Confidence reason: {confidence_reason}")
 
-        hashtags = await generate_hashtags(revised_draft)
+        hashtags = await generate_hashtags(final_draft)
       
         # print(f"📤 Returning response with confidence: {confidence}")
 
@@ -193,7 +193,7 @@ class LinkedInService:
             minimum_confidence=request.automation.minimum_confidence,
             dry_run=request.automation.dry_run,
             hashtags=hashtags,
-            status="revised",
+            status="AI_REVISED",
             company=request.brand.company_name,
             goal=request.context.goal,
             topic=request.context.topic,
