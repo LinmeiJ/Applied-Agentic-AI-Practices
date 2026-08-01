@@ -149,14 +149,72 @@ kill -9 <ID>
 http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs # the swagger page
 Note: if n8n runs in a docker container, you need this endpoint in the HTTP request URL: http://host.docker.internal:8000/linkedin and start the app using "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-Run n8n: ```n8n source "<Path to project>/.venv/bin/activate"```
+Run n8n at applied-agentic-ai-practices: 
+```
+source .venv/bin/activate
+#then
+n8n
+```
+```
+open -a Docker
+```
+
 ## Add service & model layer
 service.py & model.py (test w/ hardcoded messages)
 
 ## LLM - Ollama
+- Create the following 3 files:
+![alt text](image.png)
+
+- instsall: curl -fsSL https://ollama.com/install.sh | sh
+    Verify: ollama --version
+    disable auto-start immediately: sudo killall -9 ollama 2>/dev/null  
+    Remove launch service: 
+    ```
+    launchctl bootout gui/$(id -u)/com.ollama.ollama 2>/dev/null
+    sudo launchctl bootout system/com.ollama.ollama 2>/dev/null
+    ```
+    Override to prevent restart:
+    ```
+    launchctl override disable gui/$(id -u)/com.ollama.ollama
+    sudo launchctl override disable system/com.ollama.ollama
+    ```
+    Remove the plist:
+    ```
+    rm -f ~/Library/LaunchAgents/com.ollama.ollama.plist
+    sudo rm -f /Library/LaunchDaemons/com.ollama.ollama.plist
+    ```
+    Stop ollama: (rememebr to quit the desktop one)
+    ```~/.local/bin/ollama-stop.sh```
+    Start ollama:
+        ```~/.local/bin/ollama-stat.sh```
+
+    Kill all ports related to 8000 at once: lsof -ti :8000 | xargs kill -9
+
+
+
+       
+
+
+
+
 - run ```ollama serve```: listen tcp 127.0.0.1:11434
-- check if it is running: curl http://localhost:11434
+- check if it is running: 
+```# Check port
+lsof -i :11434
+
+# Check processes
+ps aux | grep ollama | grep -v grep
+
+# Check service status
+launchctl list | grep ollama
+```
 - check the llm container: ollama ps
+- Kill ollama by port: lsof -ti :11434 | xargs kill -9
+             by all ollama processes: sudo killall -9 ollama
+             Clean kill: lsof -i :11434 & then kill -15 PID
+
+
 
 ## Configuraiton management (config.py)
 

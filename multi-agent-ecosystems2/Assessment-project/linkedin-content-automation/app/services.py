@@ -1,3 +1,5 @@
+from app.agents import writer_agent
+
 from .models import LinkedInRequest, LinkedInResponse
 from app.agents.idea_agent import create_idea_agent
 from app.agents.writer_agent import create_writer_agent
@@ -91,34 +93,9 @@ class LinkedInService:
                 reject_reason=("System rejection: Revision limit exceeded"),
             )
 
-        reviewer_agent = create_reviewer_agent()
-
-        task = f"""
-            Revise the LinkedIn post below based on the reviewer's feedback.
-
-            Brand voice:
-            {request.brand.brand_voice}
-
-            Target audience:
-            {request.brand.target_audience}
-
-            Previous post:
-            {request.previous_post}
-
-            Reviewer feedback:
-            {request.human_feedback}
-
-            Reviewer number:
-            {request.revision_number}
-
-            Apply the feedback, and also improve grammar, clarity, engagement, and professionalism.
-            Return only the revised post.
-            """
-        
-        # Use the writer agent with feedback
         writer_agent = create_writer_agent()
-        
-        task = f"""
+
+        task = f"""     
             Revise the LinkedIn post below based on the reviewer's feedback.
 
             Company: {request.brand.company_name}
@@ -149,10 +126,8 @@ class LinkedInService:
         result = await writer_agent.run(task=task)
         revised_draft = result.messages[-1].content
 
-
-        # Then review it (polish) - this ensures quality
         reviewer_agent = create_reviewer_agent()
-        
+
         review_task = f"""
             Review and polish the LinkedIn post below.
 
@@ -165,12 +140,9 @@ class LinkedInService:
             Improve grammar, clarity, engagement, and professionalism.
             Return only the improved post.
             """
-        
+    
         review_result = await reviewer_agent.run(task=review_task)
         final_draft = review_result.messages[-1].content
-
-        # print(f"📝 Revised draft length: {len(revised_draft)}")
-        # print(f"📝 Revised draft preview: {revised_draft[:200]}...")
 
         # Evaluate the final version
         confidence, confidence_reason = await evaluate_linkedin_post(
@@ -187,7 +159,7 @@ class LinkedInService:
 
         return LinkedInResponse(
             ideas=[],
-            draft=revised_draft,
+            draft=final_draft,
             confidence=confidence,
             confidence_reason=confidence_reason,
             minimum_confidence=request.automation.minimum_confidence,
