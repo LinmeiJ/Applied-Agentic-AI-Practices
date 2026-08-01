@@ -21,7 +21,7 @@ def create_model_client( model_type: ModelType = ModelType.LOCAL, ):
 
 def create_local_model_client():
     return OllamaChatCompletionClient(
-        model="deepseek-r1:14b",     # <-- matches your `ollama list` output exactly
+        model="qwen3:8b",     # <-- matches your `ollama list` output exactly
         host="http://localhost:11434",
     )
 
