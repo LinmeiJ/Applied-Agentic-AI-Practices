@@ -9,7 +9,7 @@ def create_evaluator_agent() -> AssistantAgent:
     """
     return AssistantAgent(
         name="evaluator_agent",
-        model_client=create_model_client(ModelType.OPENAI),
+        model_client=create_model_client(ModelType.CLOUD),
         system_message="""
             You are a strict LinkedIn content quality and risk evaluator for a
             fintech brand. Posts may be published on behalf of company leadership,

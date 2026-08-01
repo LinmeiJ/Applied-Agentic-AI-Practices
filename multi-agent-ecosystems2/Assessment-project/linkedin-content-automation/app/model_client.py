@@ -9,7 +9,7 @@ def create_model_client( model_type: ModelType = ModelType.LOCAL, ):
     if model_type == ModelType.LOCAL:
         return create_local_model_client()
     
-    if model_type == ModelType.OPENAI:
+    if model_type == ModelType.CLOUD:
         return create_openai_model_client()
     
     # if model_type == ModelType.OPENAI:
