@@ -19,7 +19,7 @@ def create_idea_agent() -> AssistantAgent:
             "easy to read (plain language, scannable), "
             "and fun (smart humor, relatable observations, playful irony — but professional, no memes). "
             "Each idea should be scoped to fit a single LinkedIn post of roughly "
-            "100-200 words when written — favor one focused angle over covering "
+            "100-250 words when written — favor one focused angle over covering "
             "everything. "
             "Do NOT invent specific statistics, named studies, analyst predictions, or "
             "attributed quotes — only reference trends or claims in general, unattributed terms "

@@ -92,6 +92,9 @@ curl -fsSL https://ollama.com/install.sh | sh
 # Verify installation
 ollama --version
 
+#Which model is running on
+curl http://localhost:11434/api/tags
+
 # Pull the model (choose one)
 ollama pull deepseek-r1:14b  # Recommended for quality
 # OR

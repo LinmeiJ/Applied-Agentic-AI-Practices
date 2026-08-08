@@ -7,8 +7,8 @@ from app.enums import ModelType
 
 def create_model_client( model_type: ModelType = ModelType.LOCAL, ):
     if model_type == ModelType.LOCAL:
-        # return create_local_model_client()
-        return create_openai_model_client()
+        return create_local_model_client()
+        # return create_openai_model_client()
 
     
     if model_type == ModelType.CLOUD:
@@ -23,8 +23,18 @@ def create_model_client( model_type: ModelType = ModelType.LOCAL, ):
 
 def create_local_model_client():
     return OllamaChatCompletionClient(
-        model="qwen3:8b",     # <-- matches your `ollama list` output exactly
+        model="qwen3:8b",
         host="http://localhost:11434",
+        model_info={
+            "vision": False,
+            "function_calling": False,
+            "json_output": False,
+            "structured_output": False,
+            "family": "unknown",
+        },
+        options={
+            "num_predict": 800,   # hard cap on output tokens
+        },
     )
 
 def create_openai_model_client():

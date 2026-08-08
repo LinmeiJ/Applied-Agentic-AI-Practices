@@ -18,18 +18,24 @@ def create_evaluator_agent() -> AssistantAgent:
             STEP 1 — BIAS AND JUDGMENT GATE (check this first, independently of
             everything else):
 
-            Flag contains_bias_or_judgment = true if the post contains ANY of:
+            Flag contains_bias_or_judgment = true ONLY if the post contains ANY of:
             - stereotyping or generalizations about a group (gender, race, age,
               nationality, religion, disability, political affiliation, etc.)
             - judgmental or dismissive language about a group, competitor,
               customer segment, or profession (e.g. "unlike lazy Gen Z workers",
               "only amateurs still use spreadsheets")
-            - unsubstantiated claims presented as fact (e.g. specific statistics,
-              comparative superiority claims) with no attribution
             - divisive political, religious, or ideological opinion unrelated to
               the business topic
             - language that could reasonably embarrass a named executive or the
               company if quoted out of context
+
+            Ordinary confident marketing language ("fast", "reliable", "seamless",
+            "low-risk", "ensures X", "doesn't crash") is NOT bias, even without a
+            citation — this is normal LinkedIn writing style, not a group judgment.
+            Do NOT flag general qualitative claims about a product, process, or
+            technology as bias. Specific, checkable factual claims (numbers, named
+            studies, guarantees) are handled separately under STEP 1B — do not
+            double-flag them here.
 
             If flagged true, explain exactly which phrase triggered it. Ordinary
             confident business claims about the COMPANY's own product/service
@@ -40,6 +46,15 @@ def create_evaluator_agent() -> AssistantAgent:
             checks carry real legal/regulatory weight, not just reputational risk.
 
             Flag contains_compliance_risk = true if the post contains ANY of:
+            - a SPECIFIC, checkable factual claim (a percentage, a statistic, a
+              named study, a benchmark number, dollar figures, dates, or a named
+              competitor comparison) that is not supported by the provided key
+              points or brand/context information. General qualitative language
+              ("fast", "reliable", "low-risk", "ensures code doesn't crash" as a
+              design intent, "smaller impact than X") is NOT covered by this
+              bullet — only specific, falsifiable numeric or attributed claims
+              count. When in doubt about whether a claim is "specific" or
+              "general," treat it as general and do not flag it.
             - non-public financial figures, unreleased product details, customer
               names or customer data, internal metrics, or any information that
               would reasonably be considered confidential or not-yet-public
@@ -70,26 +85,17 @@ def create_evaluator_agent() -> AssistantAgent:
             on the stated goal and audience.
 
             STEP 2 — SCORE EACH CRITERION independently (0.0 to 1.0), using these
-            anchors. Criteria are ordered by risk: compliance/reputational risk
-            first, then brand and relevance, then readability and format, then
-            engagement last.
+            anchors:
 
-            1. credibility_and_accuracy
-               0.0 = contains specific facts, statistics, named studies, or
-                     sourced claims that cannot be verified as true, or that
-                     are likely fabricated/hallucinated
-               0.5 = contains general claims that are plausible but vague or
-                     unattributed (no specific source, no specific number)
-               1.0 = contains no unverifiable factual claims, or any specific
-                     claims included are properly attributed and verifiable
+            1. grammar_readability
+               0.0 = multiple grammar/spelling errors, hard to follow
+               0.5 = readable but some awkward phrasing or minor errors
+               1.0 = clean, professional, no errors
 
-            2. leadership_tone_appropriateness
-               0.0 = casual, inflammatory, opinionated, or something an executive
-                     would be uncomfortable having attributed to them publicly
-               0.5 = professional but slightly informal, mild unsubstantiated
-                     opinion, or minor overstatement
-               1.0 = measured, confident, evidence-based, appropriate for a
-                     company leader's public voice
+            2. clarity
+               0.0 = confusing, unclear what the post is about
+               0.5 = main point is understandable but supporting detail is muddled
+               1.0 = message is immediately clear on first read
 
             3. brand_voice_alignment
                0.0 = tone contradicts the stated brand voice
@@ -111,40 +117,29 @@ def create_evaluator_agent() -> AssistantAgent:
                0.5 = some but not all required key points appear
                1.0 = all required key points appear, woven naturally
 
-            7. clarity
-               0.0 = confusing, unclear what the post is about
-               0.5 = main point is understandable but supporting detail is muddled
-               1.0 = message is immediately clear on first read
-
-            8. grammar_readability
-               0.0 = multiple grammar/spelling errors, hard to follow
-               0.5 = readable but some awkward phrasing or minor errors
-               1.0 = clean, professional, no errors
-
-            9. accessibility_and_relatability
+            7. accessibility_and_relatability
                0.0 = technical/abstract with no explanation, alienating
                0.5 = some effort to relate, but still dense or jargon-heavy
                1.0 = uses a relatable analogy or concrete example that makes
                      complex ideas accessible
 
-            10. visual_scannability
+            8. visual_scannability
                0.0 = giant wall of text, no line breaks
                0.5 = some paragraphs but still dense
                1.0 = short paragraphs, line breaks, easy to scan
 
-            11. engagement_potential
+            9. engagement_potential
                0.0 = no hook, no CTA, unlikely to get engagement
                0.5 = has a hook or CTA but weak/generic
                1.0 = strong hook, natural CTA, genuinely likely to drive engagement
-            
-            12. length_and_conciseness
-               0.0 = post exceeds roughly 300 words / 2000 characters — well past LinkedIn's
-                     visible-before-"see more"-truncation range, likely to lose most readers
-                     before they reach the main content
-               0.5 = post is roughly 200-300 words — readable but longer than ideal;
-                     consider whether all sections earn their place
-               1.0 = post is roughly 100-200 words — a complete, focused thought that
-                     reads well both before and after LinkedIn's truncation point
+
+            10. leadership_tone_appropriateness
+               0.0 = casual, inflammatory, opinionated, or something an executive
+                     would be uncomfortable having attributed to them publicly
+               0.5 = professional but slightly informal, mild unsubstantiated
+                     opinion, or minor overstatement
+               1.0 = measured, confident, evidence-based, appropriate for a
+                     company leader's public voice
 
             For each criterion, give a score and a one-sentence justification
             citing specific evidence from the post text.
@@ -162,30 +157,28 @@ def create_evaluator_agent() -> AssistantAgent:
                 "explanation": "..."
               },
               "scores": {
-                "credibility_and_accuracy": 0.0,
-                "leadership_tone_appropriateness": 0.0,
+                "grammar_readability": 0.0,
+                "clarity": 0.0,
                 "brand_voice_alignment": 0.0,
                 "topic_relevance": 0.0,
                 "audience_alignment": 0.0,
                 "key_point_coverage": 0.0,
-                "clarity": 0.0,
-                "grammar_readability": 0.0,
                 "accessibility_and_relatability": 0.0,
                 "visual_scannability": 0.0,
-                "engagement_potential": 0.0
+                "engagement_potential": 0.0,
+                "leadership_tone_appropriateness": 0.0
               },
               "justifications": {
-                "credibility_and_accuracy": "...",
-                "leadership_tone_appropriateness": "...",
+                "grammar_readability": "...",
+                "clarity": "...",
                 "brand_voice_alignment": "...",
                 "topic_relevance": "...",
                 "audience_alignment": "...",
                 "key_point_coverage": "...",
-                "clarity": "...",
-                "grammar_readability": "...",
                 "accessibility_and_relatability": "...",
                 "visual_scannability": "...",
-                "engagement_potential": "..."
+                "engagement_potential": "...",
+                "leadership_tone_appropriateness": "..."
               }
             }
             """,

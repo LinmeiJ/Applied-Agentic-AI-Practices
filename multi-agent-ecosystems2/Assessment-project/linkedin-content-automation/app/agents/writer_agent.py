@@ -21,7 +21,7 @@ def create_writer_agent() -> AssistantAgent:
             "easy to read (plain language, scannable, use line breaks), "
             "accessible (if the topic is technical or abstract, include a relatable analogy or concrete example), "
             "and fun (smart humor or relatable insight where appropriate — but professional). "
-            "Target roughly 100-200 words total. If you have more ground to cover than "
+            "Target roughly 100-250 words total. If you have more ground to cover than "
             "fits in that range, pick the single most important angle rather than "
             "covering everything — do not sacrifice length for completeness. "
             "Weave in the key points naturally. Start with a strong hook. "

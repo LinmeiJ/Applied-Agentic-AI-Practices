@@ -8,8 +8,13 @@ import json
 import asyncio
 from datetime import datetime
 from typing import Optional, Tuple
+import asyncio
 
-MAX_REVISIONS = 5
+# module-level, shared across requests
+_ollama_lock = asyncio.Lock()
+
+
+MAX_REVISIONS = 3
 AI_DISCLOSURE = (
     "\n\n🤖 This post was drafted by a 5-agent AI system "
     "(idea, writer, reviewer, evaluator, hashtag) and reviewed by a human before publishing."
@@ -28,10 +33,11 @@ async def safe_agent_call(agent_func, *args, **kwargs) -> Optional[str]:
     """
     max_retries = 2
     retry_delay = 2  # seconds
+    func_name = agent_func.__name__ if hasattr(agent_func, '__name__') else str(agent_func)
 
     for attempt in range(max_retries + 1):
         try:
-            print(f"🔄 Calling agent: {agent_func.__name__} (attempt {attempt + 1}/{max_retries + 1})")
+            print(f"🔄 Calling agent: {func_name} (attempt {attempt + 1}/{max_retries + 1})")
             result = await agent_func(*args, **kwargs)
 
             # Validate response
@@ -40,18 +46,18 @@ async def safe_agent_call(agent_func, *args, **kwargs) -> Optional[str]:
             if isinstance(result, str) and len(result.strip()) < 10:
                 raise ValueError(f"Agent response too short: {len(result)} characters")
 
-            print(f"✅ Agent {agent_func.__name__} succeeded")
+            print(f"✅ Agent {func_name} succeeded")
             return result
 
         except Exception as e:
-            print(f"❌ Agent {agent_func.__name__} failed (attempt {attempt + 1}): {e}")
+            print(f"❌ Agent {func_name} failed (attempt {attempt + 1}): {e}")
 
             if attempt < max_retries:
-                print(f"⏳ Retrying in {retry_delay} seconds...")
+                print(f"⏳ Retrying {func_name} in {retry_delay} seconds...")
                 await asyncio.sleep(retry_delay)
             else:
-                print(f"💥 Agent {agent_func.__name__} failed after {max_retries + 1} attempts")
-                raise AgentError(f"Agent {agent_func.__name__} failed: {str(e)}")
+                print(f"💥 Agent {func_name} failed after {max_retries + 1} attempts")
+                raise AgentError(f"Agent {func_name} failed: {str(e)}")
 
     return None
 
@@ -75,129 +81,128 @@ def log_error(error_type: str, error_message: str, context: dict = None):
 # ==================== MAIN SERVICE CLASS ====================
 
 class LinkedInService:
-    async def generate_post(
-        self,
-        request: LinkedInRequest,
-    ) -> LinkedInResponse:
-        """
-        Generate a LinkedIn post with full error handling.
-        """
-        print(f"🚀 Starting post generation at {datetime.now().isoformat()}")
-        print(f"📨 Request: revise={request.revise}, topic={request.context.topic}")
+    async def generate_post(self, request: LinkedInRequest,) -> LinkedInResponse:
+        async with _ollama_lock:
 
-        try:
-            # This part is for revision flow
-            if request.revise:
-                print("🔄 Revision flow detected")
-                return await self._revise_post(request)
+            """
+            Generate a LinkedIn post with full error handling.
+            """
+            print(f"🚀 Starting post generation at {datetime.now().isoformat()}")
+            print(f"📨 Request: revise={request.revise}, topic={request.context.topic}")
 
-            # STEP 1: Generate ideas
             try:
-                topic = request.context.topic
-                ideas = await safe_agent_call(generate_linkedin_ideas, topic)
-                if ideas is None:
+                # This part is for revision flow
+                if request.revise:
+                    print("🔄 Revision flow detected")
+                    return await self._revise_post(request)
+
+                # STEP 1: Generate ideas
+                try:
+                    topic = request.context.topic
+                    ideas = await safe_agent_call(generate_linkedin_ideas, topic)
+                    if ideas is None:
+                        ideas = "1. AI is transforming fintech\n2. The future of financial planning\n3. Why data-driven decisions win"
+                        log_error("FALLBACK", "Ideas agent failed, using fallback ideas")
+                except AgentError as e:
                     ideas = "1. AI is transforming fintech\n2. The future of financial planning\n3. Why data-driven decisions win"
-                    log_error("FALLBACK", "Ideas agent failed, using fallback ideas")
-            except AgentError as e:
-                ideas = "1. AI is transforming fintech\n2. The future of financial planning\n3. Why data-driven decisions win"
-                log_error("AGENT_FAILURE", f"Idea agent failed: {str(e)}", {"topic": topic})
+                    log_error("AGENT_FAILURE", f"Idea agent failed: {str(e)}", {"topic": topic})
 
-            # STEP 2: Generate draft
-            try:
-                draft = await safe_agent_call(generate_linkedin_draft, request, ideas)
-                if draft is None:
+                # STEP 2: Generate draft
+                try:
+                    draft = await safe_agent_call(generate_linkedin_draft, request, ideas)
+                    if draft is None:
+                        draft = f"Exciting developments in {request.context.topic} are reshaping the fintech landscape. At {request.brand.company_name}, we're seeing firsthand how AI and data analytics are transforming financial planning. The future is here, and it's data-driven. #Fintech #Innovation"
+                        log_error("FALLBACK", "Draft agent failed, using fallback draft")
+                except AgentError as e:
                     draft = f"Exciting developments in {request.context.topic} are reshaping the fintech landscape. At {request.brand.company_name}, we're seeing firsthand how AI and data analytics are transforming financial planning. The future is here, and it's data-driven. #Fintech #Innovation"
-                    log_error("FALLBACK", "Draft agent failed, using fallback draft")
-            except AgentError as e:
-                draft = f"Exciting developments in {request.context.topic} are reshaping the fintech landscape. At {request.brand.company_name}, we're seeing firsthand how AI and data analytics are transforming financial planning. The future is here, and it's data-driven. #Fintech #Innovation"
-                log_error("AGENT_FAILURE", f"Writer agent failed: {str(e)}", {"topic": request.context.topic})
+                    log_error("AGENT_FAILURE", f"Writer agent failed: {str(e)}", {"topic": request.context.topic})
 
-            # STEP 3: Review draft
-            try:
-                reviewed_draft = await safe_agent_call(review_linkedin_post, request, draft)
-                if reviewed_draft is None:
+                # STEP 3: Review draft
+                try:
+                    reviewed_draft = await safe_agent_call(review_linkedin_post, request, draft)
+                    if reviewed_draft is None:
+                        reviewed_draft = draft
+                        log_error("FALLBACK", "Reviewer agent failed, using original draft")
+                except AgentError as e:
                     reviewed_draft = draft
-                    log_error("FALLBACK", "Reviewer agent failed, using original draft")
-            except AgentError as e:
-                reviewed_draft = draft
-                log_error("AGENT_FAILURE", f"Reviewer agent failed: {str(e)}", {"draft_length": len(draft)})
+                    log_error("AGENT_FAILURE", f"Reviewer agent failed: {str(e)}", {"draft_length": len(draft)})
 
-            # Append AI disclosure once, right after review is finalized.
-            # Everything downstream (evaluation, hashtags, response) uses
-            # final_draft so the disclosure is part of what actually gets
-            # scored and published.
-            final_draft = reviewed_draft + AI_DISCLOSURE
+                # Append AI disclosure once, right after review is finalized.
+                # Everything downstream (evaluation, hashtags, response) uses
+                # final_draft so the disclosure is part of what actually gets
+                # scored and published.
+                final_draft = reviewed_draft + AI_DISCLOSURE
 
-            # STEP 4: Evaluate post
-            try:
-                confidence, confidence_reason = await safe_agent_call(
-                    evaluate_linkedin_post, request, final_draft
-                )
-                if confidence is None:
-                    confidence = 0.5  # Neutral fallback
-                    confidence_reason = "Evaluation agent failed, using neutral confidence"
-                    log_error("FALLBACK", "Evaluator agent failed, using default confidence")
-            except AgentError as e:
-                confidence = 0.5
-                confidence_reason = f"Evaluation agent failed: {str(e)}"
-                log_error("AGENT_FAILURE", f"Evaluator agent failed: {str(e)}", {"draft_length": len(final_draft)})
+                # STEP 4: Evaluate post
+                try:
+                    confidence, confidence_reason = await safe_agent_call(
+                        evaluate_linkedin_post, request, final_draft
+                    )
+                    if confidence is None:
+                        confidence = 0.5  # Neutral fallback
+                        confidence_reason = "Evaluation agent failed, using neutral confidence"
+                        log_error("FALLBACK", "Evaluator agent failed, using default confidence")
+                except AgentError as e:
+                    confidence = 0.5
+                    confidence_reason = f"Evaluation agent failed: {str(e)}"
+                    log_error("AGENT_FAILURE", f"Evaluator agent failed: {str(e)}", {"draft_length": len(final_draft)})
 
-            # STEP 5: Generate hashtags
-            try:
-                hashtags = await safe_agent_call(generate_hashtags, final_draft)
-                if hashtags is None or len(hashtags) == 0:
+                # STEP 5: Generate hashtags
+                try:
+                    hashtags = await safe_agent_call(generate_hashtags, final_draft)
+                    if hashtags is None or len(hashtags) == 0:
+                        hashtags = ["#Fintech", "#Innovation", "#FutureOfFinance"]
+                        log_error("FALLBACK", "Hashtag agent failed, using fallback hashtags")
+                except AgentError as e:
                     hashtags = ["#Fintech", "#Innovation", "#FutureOfFinance"]
-                    log_error("FALLBACK", "Hashtag agent failed, using fallback hashtags")
-            except AgentError as e:
-                hashtags = ["#Fintech", "#Innovation", "#FutureOfFinance"]
-                log_error("AGENT_FAILURE", f"Hashtag agent failed: {str(e)}", {"draft_length": len(final_draft)})
+                    log_error("AGENT_FAILURE", f"Hashtag agent failed: {str(e)}", {"draft_length": len(final_draft)})
 
-            print(f"✅ Post generation completed at {datetime.now().isoformat()}")
-            print(f"📊 Confidence: {confidence:.2f}, Hashtags: {len(hashtags)}")
+                print(f"✅ Post generation completed at {datetime.now().isoformat()}")
+                print(f"📊 Confidence: {confidence:.2f}, Hashtags: {len(hashtags)}")
 
-            # Normal response
-            return LinkedInResponse(
-                ideas=[ideas],
-                draft=final_draft,
-                confidence=confidence,
-                confidence_reason=confidence_reason,
-                minimum_confidence=request.automation.minimum_confidence,
-                dry_run=request.automation.dry_run,
-                hashtags=hashtags,
-                status="AI_GENERATED",
-                company=request.brand.company_name,
-                goal=request.context.goal,
-                topic=request.context.topic,
-                audience=request.brand.target_audience,
-                revision_number=request.revision_number,
-                # Decision logic omitted for now (per your request)
-                decision=None,
-                reject_reason=None,
-            )
+                # Normal response
+                return LinkedInResponse(
+                    ideas=[ideas],
+                    draft=final_draft,
+                    confidence=confidence,
+                    confidence_reason=confidence_reason,
+                    minimum_confidence=request.automation.minimum_confidence,
+                    dry_run=request.automation.dry_run,
+                    hashtags=hashtags,
+                    status="AI_GENERATED",
+                    company=request.brand.company_name,
+                    goal=request.context.goal,
+                    topic=request.context.topic,
+                    audience=request.brand.target_audience,
+                    revision_number=request.revision_number,
+                    # Decision logic omitted for now (per your request)
+                    decision=None,
+                    reject_reason=None,
+                )
 
-        except Exception as e:
-            # Catch-all for unexpected errors
-            print(f"💥 UNEXPECTED ERROR in generate_post: {e}")
-            log_error("UNEXPECTED", str(e), {"request": request.model_dump_json()})
+            except Exception as e:
+                # Catch-all for unexpected errors
+                print(f"💥 UNEXPECTED ERROR in generate_post: {e}")
+                log_error("UNEXPECTED", str(e), {"request": request.model_dump_json()})
 
-            # Return a degraded but functional response
-            return LinkedInResponse(
-                ideas=["Unable to generate ideas at this time"],
-                draft=f"We encountered an error while generating your post. Please try again later.\n\nError: {str(e)}",
-                confidence=0.0,
-                confidence_reason=f"Generation failed: {str(e)}",
-                minimum_confidence=request.automation.minimum_confidence,
-                dry_run=request.automation.dry_run,
-                hashtags=["#Error", "#PleaseRetry"],
-                status="ERROR",
-                company=request.brand.company_name,
-                goal=request.context.goal,
-                topic=request.context.topic,
-                audience=request.brand.target_audience,
-                revision_number=request.revision_number,
-                decision="reject",
-                reject_reason=f"System error: {str(e)}",
-            )
+                # Return a degraded but functional response
+                return LinkedInResponse(
+                    ideas=["Unable to generate ideas at this time"],
+                    draft=f"We encountered an error while generating your post. Please try again later.\n\nError: {str(e)}",
+                    confidence=0.0,
+                    confidence_reason=f"Generation failed: {str(e)}",
+                    minimum_confidence=request.automation.minimum_confidence,
+                    dry_run=request.automation.dry_run,
+                    hashtags=["#Error", "#PleaseRetry"],
+                    status="ERROR",
+                    company=request.brand.company_name,
+                    goal=request.context.goal,
+                    topic=request.context.topic,
+                    audience=request.brand.target_audience,
+                    revision_number=request.revision_number,
+                    decision="reject",
+                    reject_reason=f"System error: {str(e)}",
+                )
 
     async def _revise_post(
         self,
@@ -384,16 +389,19 @@ class LinkedInService:
 # ==================== AGENT FUNCTIONS ====================
 
 # Weights should sum to 1.0. Tune these based on what matters most to the brand.
+# These 10 keys must exactly match the "scores"/"justifications" keys in
+# evaluator_agent.py's system_message JSON schema - if you edit the rubric
+# there, mirror the change here too, or the schema-mismatch check below will
+# raise instead of silently under/over-weighting the score.
 EVALUATION_WEIGHTS = {
-    "grammar_readability": 0.05,
-    "clarity": 0.07,
-    "brand_voice_alignment": 0.11,
-    "audience_alignment": 0.10,
-    "key_point_coverage": 0.13,
-    "engagement_potential": 0.09,
-    "accessibility_and_relatability": 0.09,
-    "visual_scannability": 0.07,
-    "length_and_conciseness": 0.08,   # NEW
+    "grammar_readability": 0.06,
+    "clarity": 0.08,
+    "brand_voice_alignment": 0.12,
+    "audience_alignment": 0.11,
+    "key_point_coverage": 0.14,
+    "engagement_potential": 0.10,
+    "accessibility_and_relatability": 0.10,
+    "visual_scannability": 0.08,
     "topic_relevance": 0.07,
     "leadership_tone_appropriateness": 0.14,
 }
@@ -471,6 +479,15 @@ async def evaluate_linkedin_post(
 
             scores = evaluation["scores"]
             justifications = evaluation["justifications"]
+
+            expected_keys = set(EVALUATION_WEIGHTS)
+            actual_keys = set(scores)
+            if expected_keys != actual_keys:
+                raise ValueError(
+                    "Evaluator schema mismatch - "
+                    f"missing from response: {expected_keys - actual_keys}, "
+                    f"unexpected in response: {actual_keys - expected_keys}"
+                )
 
             for criterion in EVALUATION_WEIGHTS:
                 score = float(scores[criterion])

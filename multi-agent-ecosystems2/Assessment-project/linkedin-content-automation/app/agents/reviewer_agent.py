@@ -21,7 +21,7 @@ def create_reviewer_agent() -> AssistantAgent:
             "engagement (strong hook, clear value, mild CTA if missing), "
             "scannability (break long paragraphs, add line breaks), "
             "accessibility (rewrite jargon or abstract passages with relatable analogies or concrete examples), "
-            "length (if the post exceeds roughly 200 words, cut it down to the single "
+            "length (if the post exceeds roughly 250 words, cut it down to the single "
             "strongest angle rather than trying to preserve every point — LinkedIn "
             "truncates long posts, so a shorter, focused post outperforms a longer, "
             "comprehensive one), "
