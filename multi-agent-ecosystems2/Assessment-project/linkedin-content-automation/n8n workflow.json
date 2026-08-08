@@ -1,0 +1,1423 @@
+{
+  "name": "linkedln content automation workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e70f8875-150f-43c0-890b-e53d6920b462",
+              "name": "company_name",
+              "value": "OpenAI",
+              "type": "string"
+            },
+            {
+              "id": "0931b0d7-13a8-4f47-ba08-7de815f386bd",
+              "name": "industry",
+              "value": "Artificial Intelligence",
+              "type": "string"
+            },
+            {
+              "id": "532324f5-b8e2-4624-8678-bab9693bd64f",
+              "name": "brand_voice",
+              "value": "Professional and friendly",
+              "type": "string"
+            },
+            {
+              "id": "7f55ee83-520f-48be-ae2c-0cfab4ecc201",
+              "name": "target_audience",
+              "value": "Software engineers",
+              "type": "string"
+            },
+            {
+              "id": "631f51c1-3d25-4481-8805-0d955251bc7a",
+              "name": "topic",
+              "value": "Multi-agent AI systems: content publishing vs. software SDLC automation",
+              "type": "string"
+            },
+            {
+              "id": "67797303-3742-47d2-977b-cb08bbe40ad8",
+              "name": "goal",
+              "value": "Educate professionals",
+              "type": "string"
+            },
+            {
+              "id": "cee91bfe-bc68-44c2-9ab7-f634444eab72",
+              "name": "key_points",
+              "value": "Content automation is comparatively easier to verify with LLM-based evaluation, Code correctness requires domain expertise that's hard to fully automate, Reversibility and blast radius differ between a bad post and a bad deploy, Confidence-gated human review is a practical middle ground",
+              "type": "string"
+            },
+            {
+              "id": "ecddff28-007e-4844-ba83-d73808852a09",
+              "name": "dry_run",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "b17aae9d-cd2a-44ec-af0c-6d2b91e02ad2",
+              "name": "approver_email",
+              "value": "lynnmil9999@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "07005bc5-ae3d-48fa-aa61-c6caf363452f",
+              "name": "revision_number",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "cb9df54d-a968-4abf-981f-b99182517702",
+              "name": "minimum_confidence",
+              "value": 0.9,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "8c4d54ec-61a9-407a-91c8-5c743f02bd08",
+      "name": "Brand Config"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": []
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        16
+      ],
+      "id": "9f19e37c-d682-44d9-9828-7ff75cf3d7ac",
+      "name": "Compose Final"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "05d25c7a-04f1-462b-8a32-1396ddcb0841",
+              "leftValue": "={{ $node[\"Brand Config\"].json[\"dry_run\"] }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1888,
+        -544
+      ],
+      "id": "536965c0-76e5-41f1-ad7d-4b7df54264a3",
+      "name": "Dry Run?"
+    },
+    {
+      "parameters": {
+        "person": "j43Ck2G5Bl",
+        "text": "=🤖[Topic: {{ $('Compose Final').item.json.topic}}]🤖\n\n\n{{ $('Compose Final').item.json.draft }}\n\n{{ $('Compose Final').item.json.hashtags.join(' ') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -128
+      ],
+      "id": "9811b063-b7b1-409e-8c76-292565f28447",
+      "name": "Linkedln",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "PmW1Zc46BAzKDJOo",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1STE-WdI5F5pGB7lXpvJbLV5Tjr7SmWrHUsLg1Ujzi4c",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Automation Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1STE-WdI5F5pGB7lXpvJbLV5Tjr7SmWrHUsLg1Ujzi4c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1STE-WdI5F5pGB7lXpvJbLV5Tjr7SmWrHUsLg1Ujzi4c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "Company": "={{ $('Compose Final').item.json.company }}",
+            "Topic": "={{ $('Compose Final').item.json.topic }}",
+            "Confidence": "={{ $('Compose Final').item.json.confidence }}",
+            "Status": "={{ $('Compose Final').item.json.status }}",
+            "Final Post": "={{ $('Compose Final').item.json.draft }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Confidence",
+              "displayName": "Confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final Post",
+              "displayName": "Final Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        -128
+      ],
+      "id": "d87fee43-49bf-4c3e-b80b-ff3338cf6c07",
+      "name": "Linkedln Post Activity Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "llpwz1aBfiv7l3MN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "19efad89-5942-4c9b-a514-21ac9a33ff5e",
+              "leftValue": "={{ $node[\"Generate Linkedln Content\"].json[\"confidence\"] }}",
+              "rightValue": "={{ $json.minimum_confidence }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "8b732016-0aa2-411f-b4d4-e3f9b1e63603",
+              "leftValue": "={{ $json.dry_run}}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        16
+      ],
+      "id": "32143cc0-1641-4fdc-becf-410664e96349",
+      "name": "Approval Gate"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -528,
+        16
+      ],
+      "id": "2f692738-a280-4f21-bfb4-4bbf2aa8aca5",
+      "name": "Schedule Trigger",
+      "retryOnFail": false,
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "maxTries": null,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "lynnmil9999@gmail.com",
+        "subject": "=LinkedIn Approval Required - {{ $('Compose Final').item.json.topic }}",
+        "message": "=<h2>LinkedIn Post Approval Required</h2>\n\n<p><strong>Company:</strong> {{ $('Compose Final').item.json.company }}</p>\n\n<p><strong>Goal:</strong> {{ $('Compose Final').item.json.goal }}</p>\n\n<p><strong>Topic:</strong> {{ $('Compose Final').item.json.topic }}</p>\n\n<p><strong>Confidence:</strong>\n{{ $('Compose Final').item.json.confidence }}\n</p>\n\n<hr>\n\n<p><strong>Proposed LinkedIn Post</strong></p>\n\n<p style=\"white-space:pre-wrap\">\n{{ $('Compose Final').item.json.final_post }}\n</p>\n\n<hr>\n\n<p>\nPlease review this post and choose an action below.\n</p>",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        -544
+      ],
+      "id": "7dd4cacd-eb02-4c3f-a536-ae90871c4053",
+      "name": "Human Approval",
+      "webhookId": "043a3e58-6f4d-4a9f-9eaa-472dbf6a5cf2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eaHDkc3KGa3ONFvL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.Decision}}",
+                    "rightValue": "=Approve",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f64b307a-95b3-46b2-834c-c54ccd2c756d"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "94700f98-223c-447a-b11d-b212acbac83e",
+                    "leftValue": "={{ $json.data.Decision}}",
+                    "rightValue": "Reject",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8538c4b1-ee4e-490f-98d9-15af5c446f8f",
+                    "leftValue": "={{ $json.data.Decision}}",
+                    "rightValue": "Revise",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        64
+      ],
+      "id": "bf4f8ab6-ff9d-4902-807a-41daacf800b2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/linkedin",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    brand: {\n      company_name: $json.company_name,\n      industry: $json.industry,\n      brand_voice: $json.brand_voice,\n      target_audience: $json.target_audience\n    },\n    context: {\n      topic: $json.topic,\n      goal: $json.goal,\n      key_points: $json.key_points\n        .split(',')\n        .map(item => item.trim()),\n      dry_run: $json.dry_run,\n      revision: $json.revision_number,\n      minimum_confidence: $json.minimum_confidence\n    }\n  }\n}}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "0070e37d-3c34-48dd-a5e2-4a5c7d3c5ac4",
+      "name": "Generate Linkedln Content",
+      "retryOnFail": false,
+      "maxTries": 2,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/linkedin",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (() => {\n  return {\n    brand: {\n      company_name: $json.company,\n      industry: $json.industry || 'Technology',\n      brand_voice: $json.brand_voice || 'professional and informative',\n      target_audience: $json.audience\n    },\n    context: {\n      goal: $json.goal,\n      topic: $json.topic,\n      key_points: $json.key_points || []\n    },\n    automation: {\n      confidence: $json.confidence,\n      minimum_confidence: $json.minimum_confidence,\n      dry_run: $json.dry_run ?? true\n    },\n    revise: $json.revise ?? false,\n    previous_post: $json.previous_post,\n    human_feedback: $json.reviewer_feedback,\n    reviewer_name: $json.reviewer,\n    reviewer_name: $json.decision,\n    revision_number: $json.revision_number};\n})() }}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1456,
+        208
+      ],
+      "id": "04f1f460-7fba-4ca1-ab10-43e084ea7cd2",
+      "name": "Revise Linkedln Content",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a41aff46-2cad-4c65-b209-997f448033a9",
+              "name": "revise",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "2e5afdaf-96eb-4ea4-b682-469c6b303eeb",
+              "name": "=previous_post",
+              "value": "={{ $('Compose Final').item.json.final_post }}",
+              "type": "string"
+            },
+            {
+              "id": "a0e68d84-e17c-469f-81e5-fde4238465f1",
+              "name": "reviewer_feedback",
+              "value": "={{ $json.data.Feedback }}",
+              "type": "string"
+            },
+            {
+              "id": "086be056-52c9-4213-8d1c-37608f9cb7c4",
+              "name": "company",
+              "value": "={{ $('Compose Final').item.json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "884f6f1c-3e0e-4da0-917a-3dd509b14a0d",
+              "name": "goal",
+              "value": "={{ $('Compose Final').item.json.goal }}",
+              "type": "string"
+            },
+            {
+              "id": "50b3d792-688f-4cc8-bf6b-ee7544b4a6a1",
+              "name": "topic",
+              "value": "={{ $('Compose Final').item.json.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "d27ae101-6c0f-436a-bcc3-a0923f99ae75",
+              "name": "audience",
+              "value": "={{ $('Compose Final').item.json.audience }}",
+              "type": "string"
+            },
+            {
+              "id": "baccdb90-e33e-47e8-a91a-27be6b3ce311",
+              "name": "reviewer",
+              "value": "={{ $json.data['Reviwer Name/SSO'] }}",
+              "type": "string"
+            },
+            {
+              "id": "840087dc-ec72-445c-aae3-61120057bf13",
+              "name": "revision_number",
+              "value": "={{ $('Compose Final').item.json.revision_number + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "75f2709f-811b-4d37-bacb-ae20897e4f02",
+              "name": "confidence",
+              "value": "={{ $('Compose Final').item.json.confidence }}",
+              "type": "number"
+            },
+            {
+              "id": "70f923b7-721a-41ad-a0fa-35786a60d100",
+              "name": "decision",
+              "value": "={{ $json.data.Decision }}",
+              "type": "string"
+            },
+            {
+              "id": "9a380bba-3cae-4a1f-9f32-70ee03dfab42",
+              "name": "minimum_confidence",
+              "value": "={{ $('Compose Final').item.json.minimum_confidence }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        208
+      ],
+      "id": "8b54538b-7850-4d4d-afa9-07d3b2a84cba",
+      "name": "Create Revision Playload"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#all-agentic-ai-fun",
+          "mode": "name"
+        },
+        "message": "=LinkedIn Post Review Required\n\nTopic: {{ $('Generate Linkedln Content').item.json.topic}}\n\nConfidence: {{ $json.confidence }}\n\nRevision Number: {{ $json.revision_number }}\n\nProposed Post:\n\n{{ $json.draft }}\n\n(Select Approve, Revise, or Reject)",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Decision",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Approve"
+                  },
+                  {
+                    "option": "Revise"
+                  },
+                  {
+                    "option": "Reject"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Feedback"
+            },
+            {
+              "fieldLabel": "Reviwer Name/SSO"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        912,
+        80
+      ],
+      "id": "fcfe08bc-8a10-4605-9b76-9f7231c51edb",
+      "name": "Human Review",
+      "webhookId": "5e3c7a9a-c922-4d72-8b27-a953408da790",
+      "alwaysOutputData": false,
+      "credentials": {
+        "slackApi": {
+          "id": "0NA5LEH3rmgrU0EI",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "61d0eed9-d7fb-4506-8565-81ab78e10309",
+              "leftValue": "={{$json.decision}}",
+              "rightValue": "reject",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1680,
+        368
+      ],
+      "id": "794ff7c4-3b09-4e5e-af15-27c15aeb0587",
+      "name": "Revise Limit Exceeded"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\n\nconsole.log('📊 Validating response...');\n\n// ============================================\n// HELPER: Create error response\n// ============================================\nfunction createErrorResponse(message, originalResponse) {\n    return {\n        validationError: true,\n        message: message,\n        timestamp: new Date().toISOString(),\n        originalResponse: originalResponse || null\n    };\n}\n\n// ============================================\n// HELPER: Create success response\n// ============================================\nfunction createSuccessResponse(data) {\n    return {\n        validationError: false,  // ✅ Explicitly set to false\n        ...data\n    };\n}\n\n// ============================================\n// VALIDATION LOGIC\n// ============================================\ntry {\n\n    // 🧪 TEST: force an error to verify the error alert flow — remove after testing\n    // throw new Error(\"TEST: forced validation error to trigger error alert flow\");\n\n\n    // 1. Check required fields\n    const required = ['ideas', 'draft', 'confidence', 'hashtags', 'status', 'minimum_confidence', 'dry_run'];\n    const missing = required.filter(f => !response[f]);\n\n    if (missing.length > 0) {\n        return createErrorResponse(`Missing required fields: ${missing.join(', ')}`, response);\n    }\n\n    // 2. Validate confidence (0-1)\n    if (response.confidence < 0 || response.confidence > 1) {\n        return createErrorResponse(`Invalid confidence score: ${response.confidence}`, response);\n    }\n\n    // 🔥 Confidence === 0 is an ERROR\n    if (response.confidence === 0) {\n        const reason = response.confidence_reason || 'No reason provided';\n        return createErrorResponse(`Confidence score is 0. Evaluator failed or bias detected: ${reason}`, response);\n    }\n\n    // 3. Validate minimum_confidence (0-1)\n    if (response.minimum_confidence < 0 || response.minimum_confidence > 1) {\n        return createErrorResponse(`Invalid minimum_confidence: ${response.minimum_confidence}`, response);\n    }\n\n    // 4. Validate dry_run is boolean\n    if (typeof response.dry_run !== 'boolean') {\n        return createErrorResponse(`dry_run must be a boolean, got ${typeof response.dry_run}`, response);\n    }\n\n    // 5. Validate hashtags is an array\n    if (!Array.isArray(response.hashtags)) {\n        return createErrorResponse('Hashtags must be an array', response);\n    }\n\n    // 6. Validate hashtags has at least 1 item\n    if (response.hashtags.length === 0) {\n        return createErrorResponse('Hashtags must have at least one tag', response);\n    }\n\n    // 7. Validate ideas is an array\n    if (!Array.isArray(response.ideas)) {\n        return createErrorResponse('ideas must be an array', response);\n    }\n\n    // 8. Validate draft exists\n    if (!response.draft || response.draft.length < 10) {\n        return createErrorResponse('draft must be at least 10 characters', response);\n    }\n\n    // 9. Validate status (warning only)\n    const validStatuses = ['AI_GENERATED', 'AI_REVISED', 'AI_REJECTED', 'ERROR'];\n    if (!validStatuses.includes(response.status)) {\n        console.warn(`⚠️ Unknown status: ${response.status}`);\n    }\n\n    // 10. Validate confidence_reason (warning only)\n    if (!response.confidence_reason || response.confidence_reason.length === 0) {\n        console.warn('⚠️ confidence_reason is empty or missing');\n    }\n\n    console.log(`✅ Response validation passed. Confidence: ${response.confidence}`);\n    \n    // ✅ Return success with explicit validationError: false\n    return createSuccessResponse(response);\n\n} catch (error) {\n    console.error('❌ Unexpected validation error:', error.message);\n    return createErrorResponse(`Unexpected error: ${error.message}`, response);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        0
+      ],
+      "id": "5105ab90-43d6-4ac6-a320-0800dc9fc9b5",
+      "name": "Validate Response"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BKKG5T943",
+          "mode": "list",
+          "cachedResultName": "all-agentic-ai-fun"
+        },
+        "text": "=🚨 *LinkedIn Workflow Error*\n\nTimestamp: {{ $now }}\nError: {{ $json.message }}\nWorkflow: LinkedIn Content Automation\nPlease investigate immediately.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        432,
+        -192
+      ],
+      "id": "d82e9d52-1378-4854-b3f0-fca81be7e0e2",
+      "name": "Error Alert",
+      "webhookId": "eff06795-5c2e-438c-b56f-9f63d0cda85a",
+      "credentials": {
+        "slackApi": {
+          "id": "0NA5LEH3rmgrU0EI",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e3369af8-3b5c-444d-9e87-31ad30c732bb",
+              "leftValue": "={{ $json.validationError }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        0
+      ],
+      "id": "b93f524d-a5fd-4232-b531-6cd10f1fd298",
+      "name": "Validation Success?"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1J4o_tf2sbefICjFrQNmCbkqFt3YMGb1865XPDjXmAiw",
+          "mode": "list",
+          "cachedResultName": "Linkedln - Human Reject Posts log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J4o_tf2sbefICjFrQNmCbkqFt3YMGb1865XPDjXmAiw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J4o_tf2sbefICjFrQNmCbkqFt3YMGb1865XPDjXmAiw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "Topic": "={{ $('Compose Final').item.json.topic }}",
+            "Confidence": "={{ $('Compose Final').item.json.confidence }}",
+            "Rejected By": "={{ $json.data['Reviwer Name/SSO'] }}",
+            "ideas": "={{ $('Compose Final').item.json.ideas }}",
+            "confidence": "={{ $('Compose Final').item.json.confidence }}",
+            "draft": "={{ $('Compose Final').item.json.draft }}",
+            "status": "={{ $('Compose Final').item.json.status }}",
+            "company": "={{ $('Compose Final').item.json.company }}",
+            "goal": "={{ $('Compose Final').item.json.goal }}",
+            "topic": "={{ $('Compose Final').item.json.topic }}",
+            "audience": "={{ $('Compose Final').item.json.audience }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confidence",
+              "displayName": "Confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Approved",
+              "displayName": "Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Rejected By",
+              "displayName": "Rejected By",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Final Post",
+              "displayName": "Final Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ideas",
+              "displayName": "ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "draft",
+              "displayName": "draft",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "confidence",
+              "displayName": "confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "goal",
+              "displayName": "goal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "audience",
+              "displayName": "audience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "revision_number",
+              "displayName": "revision_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "decision",
+              "displayName": "decision",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "reject_reason",
+              "displayName": "reject_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1968,
+        80
+      ],
+      "id": "ee92edf1-e95c-4e16-b371-ad3405d8e6dc",
+      "name": "Human Rejection Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "llpwz1aBfiv7l3MN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "17OfQqUaN6LgKhEJ43_VvydYU2YH6OdcUPSq8GgMcids",
+          "mode": "list",
+          "cachedResultName": "Linkedln Revise Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17OfQqUaN6LgKhEJ43_VvydYU2YH6OdcUPSq8GgMcids/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17OfQqUaN6LgKhEJ43_VvydYU2YH6OdcUPSq8GgMcids/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "Topic": "={{ $('Compose Final').item.json.topic }}",
+            "Confidence": "={{ $json.confidence }}",
+            "Rejected By": "={{ $('Create Revision Playload').item.json.reviewer }}",
+            "reject_reason": "={{ $('Revise Linkedln Content').item.json.reject_reason}}",
+            "Full log": "={{ $json }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Confidence",
+              "displayName": "Confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rejected By",
+              "displayName": "Rejected By",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full log",
+              "displayName": "Full log",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "audience",
+              "displayName": "audience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "revision_number",
+              "displayName": "revision_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "decision",
+              "displayName": "decision",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "reject_reason",
+              "displayName": "reject_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1664,
+        176
+      ],
+      "id": "a29244d4-052b-4551-bf84-fdfb62676f41",
+      "name": "Revision Request Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "llpwz1aBfiv7l3MN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1XAsAXZstgeKvBP1BeSXRrMsFs0-fsuP43DqLlMU7LFI",
+          "mode": "list",
+          "cachedResultName": "error log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XAsAXZstgeKvBP1BeSXRrMsFs0-fsuP43DqLlMU7LFI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XAsAXZstgeKvBP1BeSXRrMsFs0-fsuP43DqLlMU7LFI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "Error": "={{ $('Validate Response').item.json.message }}\n"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error",
+              "displayName": "Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "run ID",
+              "displayName": "run ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Full Error",
+              "displayName": "Full Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        -192
+      ],
+      "id": "3bcf9322-683e-4359-a077-3fa9a42a50b5",
+      "name": "HTTP Response Error Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "llpwz1aBfiv7l3MN",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Brand Config": {
+      "main": [
+        [
+          {
+            "node": "Generate Linkedln Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compose Final": {
+      "main": [
+        [
+          {
+            "node": "Approval Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dry Run?": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Linkedln": {
+      "main": [
+        [
+          {
+            "node": "Linkedln Post Activity Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Gate": {
+      "main": [
+        [
+          {
+            "node": "Linkedln",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Human Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Brand Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Approval": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Linkedln",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Human Rejection Log",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Revision Playload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Linkedln Content": {
+      "main": [
+        [
+          {
+            "node": "Validate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Revision Playload": {
+      "main": [
+        [
+          {
+            "node": "Revise Linkedln Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revise Linkedln Content": {
+      "main": [
+        [
+          {
+            "node": "Revise Limit Exceeded",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Revision Request Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Review": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revise Limit Exceeded": {
+      "main": [
+        [
+          {
+            "node": "Human Rejection Log",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Response": {
+      "main": [
+        [
+          {
+            "node": "Validation Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Alert": {
+      "main": [
+        [
+          {
+            "node": "HTTP Response Error Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation Success?": {
+      "main": [
+        [
+          {
+            "node": "Error Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Compose Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d15a2853-7152-4e8c-937e-c238e59a4e09",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bc8d23ff8aa9d1f20b0aae6ad87c8a06cbeef514e70c18e0bfc99a1e51385e73"
+  },
+  "nodeGroups": [],
+  "id": "AY21Ko9YqpSr6SHZ",
+  "tags": []
+}
